@@ -1,11 +1,17 @@
 package com.ff.commandes_service.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderRequest {
     @NotNull(message = "Product ID cannot be blank")
     private Long productId;
