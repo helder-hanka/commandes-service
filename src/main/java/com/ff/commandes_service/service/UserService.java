@@ -8,6 +8,8 @@ import com.ff.commandes_service.entity.Orders;
 import com.ff.commandes_service.entity.OrderStatus;
 import com.ff.commandes_service.feignClient.Client;
 import com.ff.commandes_service.feignClient.ProduitClient;
+import com.ff.commandes_service.rabbitmq.OrderEventPublisher;
+import com.ff.commandes_service.rabbitmq.events.OrderEvent;
 import com.ff.commandes_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class UserService {
     private final OrderRepository orderRepository;
     private final Client client;
     private final ProduitClient produitClient;
+    private final OrderEventPublisher publisher;
 
     public Orders createOrder(OrderRequest orders) {
         // Vérifier si les données de la commande sont valides
@@ -40,7 +43,9 @@ public class UserService {
                 .orderDate(orders.getOrderDate())
                 .orderDate(orders.getOrderDate() != null ? orders.getOrderDate() : LocalDateTime.now())
                 .build();
-        return orderRepository.save(orderToSave);
+        Orders saveOrder = orderRepository.save(orderToSave);
+        publisher.publish(new OrderEvent(saveOrder));
+        return saveOrder;
     }
     // ne pas oublier la vérifier test Unitaire pour la modification de la méthode
     public CommandeDetailsResponse getOrderById(Long id) {
